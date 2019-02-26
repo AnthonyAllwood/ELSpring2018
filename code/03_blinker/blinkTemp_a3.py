@@ -30,8 +30,6 @@ GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #Setup SQLite
 db = sqlite3.connect(':memory:') #Creates database in RAM
-cursor = db.cursor() #Utilize the cursor
-cursor.execute('''CREATE TABLE tempFormat(id INTEGER PRIMARY KEY, time TEXT, temperature TEXT)''') #This creates the temperature table
 db.commit() #Commit the changes above^^
 
 
@@ -55,21 +53,14 @@ try:
 	with open("assignment3.csv", "a") as log:
 
 		while True:
-			input_state = GPIO.input(buttonPin)
-			if input_state == False:
+		#	input_state = GPIO.input(buttonPin)
+		#	if input_state == False:
 				for i in range (blinkNum):
 					oneBlink(redPin)
 				time.sleep(60)
 				data = readF(tempPin)
 				print (data)
 				log.write("{0},{1}\n".format(time.strftime("%Y-%m-%d %H:%M:%S"),str(data)))
-				timeNow = (time.strftime("%Y-%m-%d %H:%M:%S"))
-				cursor.execute('''INSERT INTO tempFORMAT VALUES(?,?)''', (time, data))
-				db.commit()
-				all_rows = cursor.fetchall()
-				os.system('clear')
-				for row in all_rows:
-					print('{0} : {1}, {2}'.format(row[0], row[1], row[2]))
 
 
 except KeyboardInterrupt:
