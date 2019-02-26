@@ -1,13 +1,13 @@
-# ELSpring2018
-This repository documents my class work and projects done for CPS342.
-1. Personal Information 
-	Name: Anthony Allwood
-	Major: Computer Engineering
-	ID: N03226184
-	Year: Senior
+Assignment 3 branch created!!!
+blinkTemp.py was modified in blinkTemp_a3.py
 
-2. Class Start Date: Jan 22, 2019
-3. Class End Date: May 8, 201 
+Modified python script to:
+
+-Read the sensor once a minute instead of when the button switch is pressed
+-Write the sensor reading to the sqlite database
+-Clear the console and print the table each time the sensor takes a reading
+
+ 
 
  
 
