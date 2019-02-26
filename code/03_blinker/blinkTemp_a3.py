@@ -50,7 +50,7 @@ def readF(tempPin):
 	return tempFahr
 
 try:
-	with open("assignment3.csv", "a") as log:
+	with open("log/assignment3.csv", "a") as log:
 
 		while True:
 		#	input_state = GPIO.input(buttonPin)
