@@ -29,7 +29,8 @@ GPIO.setup(redPin,GPIO.OUT)
 GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #Setup SQLite
-db = sqlite3.connect(':memory:') #Creates database in RAM
+db = sqlite3.connect('./log/assignment3.db') #Creates database in RAM
+cursor = db.cursor() #Get cursor
 db.commit() #Commit the changes above^^
 
 
@@ -50,21 +51,30 @@ def readF(tempPin):
 	return tempFahr
 
 try:
-	with open("log/assignment3.csv", "a") as log:
+
+	with open("./log/assignment3.csv", "a") as log:
 
 		while True:
-		#	input_state = GPIO.input(buttonPin)
-		#	if input_state == False:
-				for i in range (blinkNum):
-					oneBlink(redPin)
-				time.sleep(60)
-				data = readF(tempPin)
-				print (data)
-				log.write("{0},{1}\n".format(time.strftime("%Y-%m-%d %H:%M:%S"),str(data)))
+			#input_state = GPIO.input(buttonPin)
+			#if input_state == False:
+			for i in range (blinkNum):
+				oneBlink(redPin)
 
+			time.sleep(60)
+			data = readF(tempPin)
+			#print (data)
+			log.write("{0},{1}\n".format(time.strftime("%Y-%m-%d %H:%M:%S"),str(data)))
+			timeNow = (time.strftime("%Y-%m-%d %H:%M:%S"))
+			cursor.execute('''INSERT INTO tempFormat VALUES(?,?)''', (timeNow, str(data)))
+			db.commit()
+			all_rows = cursor.execute('''SELECT * FROM tempFormat''')
+			for row in all_rows:
+				print('{0} : {1}' .format(str(row[0]), row[1],))
+			#END
 
 except KeyboardInterrupt:
 	os.system('clear')
 	print('Thanks for Blinking and Thinking!')
 	GPIO.cleanup()
 	db.close()
+
