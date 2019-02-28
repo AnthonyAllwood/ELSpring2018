@@ -1,21 +1,29 @@
 # Assignment 3: Temp Sensor
 
 Assignment 3 branch created!!!
-blinkTemp.py was modified in blinkTemp_a3.py
+
+Complete python script in blinkTemp_a3.py
 
 Modified python script to:
 
 -Read the sensor once a minute instead of when the button switch is pressed
+
 -Write the sensor reading to the sqlite database
+
 -Clear the console and print the table each time the sensor takes a reading
 
+
 Tutorial Steps:
+
+-----------------
 
 Step 1: 
 
 Create assignment3 branch using the following git commands:
-git branch assignment3
-git checkout assignment3
+
+-git branch assignment3
+
+-git checkout assignment3
 
 Step 2: 
 
@@ -29,6 +37,8 @@ Step 3:
 
 Step 4:
 
+-Create /log directory
+
 -Create assignment3.csv file and an assignment3.db file. 
 
 Step 5:
@@ -38,10 +48,6 @@ Step 5:
 -Also modify it so that the string is written to the assignment.csv file each time it prints.
 
 Step 6:
-
--Create a /log directory
-
-Step 7:
 
 -Install sqlite3 and follow the appropriate steps under the "AnSQLiteSession.pdf" file. 
 
