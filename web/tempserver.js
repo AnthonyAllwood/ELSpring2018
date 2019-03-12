@@ -8,9 +8,9 @@ var fs = require('fs');
 const PORT = 8080;
 
 //Read from index.html file
-fs.readFile('./index.html', function (err, html)
+var html = fs.readFileSync('./index.html', ["utf-8"])
 {
-	if (err) throw err;
+
 
 	http.createServer(function(request, response)
 	{
@@ -22,4 +22,4 @@ fs.readFile('./index.html', function (err, html)
 	.listen(PORT);
 
 	console.log("Server running at http:/137.140.166.32:8080/");
-});
+};
