@@ -8,7 +8,7 @@ function drawChart()
 {
 	$.ajax({
 		type: "GET",
-		url: "./log/assignment3.csv",
+		url: "ELSpring2018/code/03_blinker/log/assignment3.db",
 		dataType: "text",
 		success: function(response)
 		{
