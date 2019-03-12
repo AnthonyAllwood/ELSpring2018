@@ -1,7 +1,7 @@
 function gaugeChart() {
 	$.ajax({
       type: "GET",
-      url: "log/templog.csv",
+      url: "./log/assignment3.csv",
       dataType: "text",
       success: function(response)
       {
