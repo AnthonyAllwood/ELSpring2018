@@ -6,8 +6,9 @@ import Adafruit_DHT
 import time
 import os
 import sqlite3
-from flask import Flask, render_template
-app = Flask(__name__)
+import sys
+
+
 
 #Assign GPIO pins
 redPin = 27
