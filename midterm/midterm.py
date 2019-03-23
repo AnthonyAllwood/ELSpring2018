@@ -34,10 +34,11 @@ def bothTriggers(trigger2, wait=5):
 		if time.time() - timeCheck > wait:
         		break
        	        continue
-		if time.time() - timeCheck <= wait:
-        		timeStamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        		time.sleep(4)
-        	continue
+	if time.time() - timeCheck <= wait:
+        	timeStamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        	time.sleep(4)
+
+	return timeStamp
 
 #Sensor stabilization for 10 seconds
 time.sleep(10)
@@ -55,14 +56,14 @@ try:
 
         	if GPIO.input(entrySensor):
 			#This print line tests to see if entrySensor is functional
-			print("entrySensor triggered")
+
 			timeStamp = bothTriggers(exitSensor)
 			if timeStamp:
 				inOrOut = "Entrance"
 				peopleCount = peopleCount + 1
 		if GPIO.input(exitSensor):
 			#This print line tests to see if exitSensor is functional
-			print("exitSensor triggered")
+
 			timeStamp = bothTriggers(entrySensor)
 			if timeStamp:
 				inOrOut = "Exit"
