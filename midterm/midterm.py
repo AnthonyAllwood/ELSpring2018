@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 #Import Libraries we will be using
 import RPi.GPIO as GPIO
 import time
@@ -18,7 +20,7 @@ GPIO.setup(entrySensor, GPIO.IN)
 GPIO.setup(exitSensor, GPIO.IN)
 
 #SQLite setup
-db = sqlite3.connect('./logPeople/peopleLog.db')
+db = sqlite3.connect('./log/logPeople.db')
 cursor = db.cursor() #Get cursor
 db.commit() #Commit Changes
 
@@ -31,12 +33,12 @@ def bothTriggers(trigger2, wait=5):
 	timeCheck = time.time()
 	while not GPIO.input(trigger2):
 		if time.time() - timeCheck > wait:
-            break
-        continue
-	if time.time() - timeCheck <= wait:
-        timeStamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        time.sleep(4)
-        continue
+        		break
+       	        continue
+		if time.time() - timeCheck <= wait:
+        		timeStamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        		time.sleep(4)
+        	continue
 
 #Stabilize sensor
 time.sleep(10)
@@ -49,32 +51,32 @@ try:
 		timeStamp = False
 		#set entry Type
 		inOrOut = "IDLE"
-        
-        if GPIO.input(entrySensor):
+
+        	if GPIO.input(entrySensor):
 			timeStamp = bothTriggers(exitSensor)
 			if timeStamp:
 				inOrOut = "Entrance"
 				peopleCount = peopleCount + 1
 		if GPIO.input(exitSensor):
-			timeStamp = bothTrigger(entrySensor)
+			timeStamp = bothTriggers(entrySensor)
 			if timeStamp:
 				inOrOut = "Exit"
 				peopleCount = peopleCount - 1
 
 #Since the timeStamp is only set when the direction is determined and both sensors are triggered we use that as the condition to write our data:
 		if timeStamp:
-			cursor.execute('''INSERT INTO peopleLog VALUES(?,?,?)''', (timeStamp, inOrOut, peopleCount))
+			cursor.execute('''INSERT INTO logPeople VALUES(?,?,?)''', (timeStamp, inOrOut, peopleCount))
 			db.commit()
-			all_rows = cursor.execute('''SELECT * FROM peopleLog''')
+			all_rows = cursor.execute('''SELECT * FROM logPeople''')
 			os.system('clear')
 			for row in all_rows:
 				print('{0} : {1} : {2}'.format(str(row[0]), row[1], str(row[2])))
 
-except mydb.Error, e:
+except db.Error, e:
 	print "Error %s:" %e.args[0]
 	sys.exit(1)
 
 except KeyboardInterrupt:
         GPIO.cleanup()
-        con.close()
-        print('Exited Cleanly')
+        db.close()
+        print('Motion was detected and recorded!!!')
