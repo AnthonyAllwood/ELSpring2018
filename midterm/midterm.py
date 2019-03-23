@@ -7,6 +7,9 @@ import os
 import sqlite3
 import sys
 
+from flask import Flask, render_template
+app = Flask(__name__)
+
 #Assign GPIO pins 13 and 26
 entrySensor = 13
 exitSensor = 26
