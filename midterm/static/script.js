@@ -1,42 +1,46 @@
-myclick();
+var count = 0;
 
-function myclick(){
-    console.log("print");
+setInterval(()=>{
+	$.getJSON('/count', function(data) {
+		if(count < data['data']) createTables();
+	})
+}, 5000)
 
+function createTables() {
     $.getJSON('/catch', function(data) {
+ 
+	var logPeople = $('<table></table>').attr({ id: "logPeople" });
 
-        for(var line in data){
-            console.log(data[line])
-            for(var i in data[line])
-                console.log(data[line][i]);
+    var head = $('<tr></tr>').attr({ class: ['head'].join(' ')}).appendTo(logPeople);
+		$('<td></td>').text('IN TIME').appendTo(head);
+		$('<td></td>').text('Type').appendTo(head);
+		$('<td></td>').text('Total people').appendTo(head);
+
+	count = 0;
+	var total_in_room = data[0][2];
+	var trace = {x:[], y:[], name:'TIME', type:'bar'}
+
+	$("#logPeople tr").remove();
+	$("#count").remove();
+
+	for (var line in data) {
+		var row = $('<tr></tr>').attr({ class: "row-class" }).appendTo(logPeople);
+			row.appendTo(logPeople)
+			$('<td></td>').text(data[line][0]).appendTo(row);
+			$('<td></td>').text(data[line][1]).appendTo(row);
+			$('<td></td>').text(data[line][2]).appendTo(row);
+
+	        trace.x.push(data[line][0])
+            	trace.y.push(data[line][2])
+
+		console.log(data[line]);
+		count++;
         }
 
-
-        $("#logPeople tr").remove();
-
-        var trace = {x:[], y:[], mode: 'lines+markers'}
-        logPeople = $('<table></table>').attr({ id: "myTable" });
-        var brain = $('<tr></tr>').attr({ class: ["class1"].join(' ') }).appendTo(logPeople)
-        $('<th></th>').text("date/time").appendTo(brain);
-        $('<th></th>').text("C").appendTo(brain);
-        $('<th></th>').text("F").appendTo(brain);
-
-        for (var line in data) {
-            var row = $('<tr></tr>').attr({ class: ["class1"].join(' ') }).appendTo(logPeople);
-            trace.x.push(data[line][0])
-
-            trace.y.push(data[line][2]);
-            for (var i in data[line]) {
-                $('<td></td>').text(data[line][i]).appendTo(row);
-            }
-
-        }
+    var count = $("<h1></h1>").text("Current in room: " + total_in_room).attr({id: '#count'}).appendTo("#table");
+	logPeople.appendTo("#table");
         var data = [ trace ];
-        var layout = {};
-        logPeople.appendTo("#box");
-
-        Plotly.newPlot('AntsGraph', data, layout, {showSendToCloud: true});
-
-        console.log(data);
-    });
+        var layout = {barmode: 'group'};
+	Plotly.newPlot('myGraph', data, layout, {}, {showSendToCloud: true})
+    })
 }
