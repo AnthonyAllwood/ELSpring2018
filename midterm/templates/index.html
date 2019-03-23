@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <title>Anthony's Motion Sensor Device (Midterm)</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='gauge.js') }}"></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="box">
+    </div>
+
+    <!-- button to check new temp -->
+    <button class="center" type="button" value="Submit" onclick="myclick()" >Read Amount of People</button>
+
+    <!-- gauge -->
+    <canvas class="center" id="foo"></canvas>
+
+    <!-- plot graph -->
+    <div class="center_graph" id="myGraph"></div>
+
+
+    <!-- the gauge -->
+    <script  type="text/javascript" >
+        var opts = {
+            angle: 0, // gauge arc
+            lineWidth: 0.40, //Thickness of the line
+            radiusScale: 1, //Relative radius
+            pointer: {
+                length: 0.6, //Gauge radius
+                strokeWidth: 0.040, 
+                color: '#000000' // color
+            },
+            limitMax: false,     
+            limitMin: false,     
+            colorStart: '#6FADCF',   
+            colorStop: '#8FC0DA',    
+            strokeColor: '#E0E0E0',  
+            generateGradient: true,
+            highDpiSupport: true, 
+            staticLabels: {
+                font: "10px Times New Roman",  //Font
+                labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],  //Portrays labels on the gauge
+                color: "#000000",  //label color
+            }, 
+            staticZones: [
+		{strokeStyle: "#007399", min: 13, max: 15},
+                {strokeStyle: "#0086b3", min: 10, max: 12},  
+                {strokeStyle: "#0099cc", min: 7, max: 9}, 
+                {strokeStyle: "#00ace6", min: 4, max: 6}, 
+                {strokeStyle: "#00bfff", min: 0, max: 3}  
+            ],renderTicks: {
+                divisions: 1,
+                divWidth: 1.1,
+                divLength: 0.7,
+                divColor: "#333333",
+                subDivisions: 3,
+                subLength: 0.5,
+                subWidth: 0.6,
+                subColor: "#666666"
+            }
+        };
+        var target = document.getElementById('foo'); //canvas
+        var gauge = new Gauge(target).setOptions(opts, percentColors); 
+        gauge.maxValue = 15; 
+        gauge.setMinValue(0);  
+        gauge.animationSpeed = 22; // Animation speed
+        gauge.set( {{ peopleCount }} ); // Set value on the gauge
+        
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js')}}"></script>    
+</body>
+
+</html>
