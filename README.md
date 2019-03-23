@@ -26,6 +26,8 @@ Web page display:
 -In the web page, also display a table with the past 10 timestamped entrances and exits
 
 
+
+
 Tutorial Steps:
 
 -----------------
@@ -42,6 +44,7 @@ Create a directory called "midterm":
 
 -All necessary files will be in this directory!
 
+
 Step 2: 
 
 -Create the Motion Detection circuit using a breadboard. Refer to the "GPIO Pinout Explained" on Google Classroom to properly connect pins
@@ -49,6 +52,7 @@ Step 2:
 -Connect one motion sensor's +Power and GND to a vdd and ground pin on the Raspberry Pi. Connect it's output to pin 13 on the Raspberry Pi. This will be the "entrySensor"
 
 -Connect the other motion sensor's +Power and GND to a vdd and ground pin on the Raspberry Pi. Connect it's output to pin 26 on the Raspberry Pi. This will be the "exitSensor"
+
 
 Step 3:
 
@@ -66,10 +70,10 @@ Step 3:
 
 	-Make sure to install and import necessary libraries (i.e install python, time library, os library) and set important GPIO parameters at the top of the file.
 
-	-Run the script. Wave your hand above both sensors to cause both of them to trigger. If your hand is waved from entrySensor to exitSensor, it should print the timestamp, "entrance", and "1" for the amount of people in
- the room. If your hand is waved from exitSensor to entrySensor, it should print the timestamp, "exit", and 0 for the amount of people in the room. 
+	-Run the script. Wave your hand above both sensors to cause both of them to trigger. If your hand is waved from entrySensor to exitSensor, it should print the timestamp, "entrance", and "1" for the amount of people in the room. If your hand is waved from exitSensor to entrySensor, it should print the timestamp, "exit", and 0 for the amount of people in the room. 
 
 	-Remember: "entrySensor to exitSensor" increments the peopleCount by 1. "exitSensor to entranceSensor" decrements by 1. 
+
 
 Step 4:
 
@@ -79,6 +83,7 @@ Step 4:
 
 -The database file created in the next few steps will be in this "log" directory 
 
+
 Step 5:
 
 -Install sqlite3 and follow the appropriate steps under the "AnSQLiteSession.pdf" file on Google Classroom with respect to the midterm.py file. 
@@ -86,6 +91,7 @@ Step 5:
 -Sqlite will be used to create a table where the string for date timestamp, "entrance" or "exit" text, and the people count for each motion reading can be recorded.
 
 -The information from this table will be stored in a database file.    
+
 
 Step 6:
 
@@ -99,12 +105,12 @@ Step 6:
 
 	-Create an "index.html" file that references these javascript files in order to create a web page that displays a chart/gauge showing the information within the database file. AGAIN...there are MANY ways to do this
 
-	-Refer to online sources if necessary to help you establish a web server. Regardless of your method, make sure there is a way to display your Raspberry Pi's IP address and any port of your choosing to the console 
-when you run your server 
+	-Refer to online sources if necessary to help you establish a web server. Regardless of your method, make sure there is a way to display your Raspberry Pi's IP address and any port of your choosing to the console when you run your server 
+
 
 - Run your server. Go to your preferred browser. Type in your Raspberry PI's IP address along with the port. It should be formatted as something like "0.0.0.1:5000" 
  
--The web page should display the chart/gauge that you created which graphically portrays how many people are in the room that updates any time an entrace or exit occurs. It should also display a table with the last few
+- The web page should display the chart/gauge that you created which graphically portrays how many people are in the room that updates any time an entrace or exit occurs. It should also display a table with the last few
 entrances and exits. 
  
 
