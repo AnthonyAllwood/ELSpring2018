@@ -7,6 +7,10 @@ import time
 import os
 import sqlite3  #This library will be used to log the timestamp and moisture readings to the database
 import smtplib  #This is the library that will be utilized in order to send email notification
+from gpiozero import MCP3008 #This library will be used for the MCP3008 ADC
+
+import spidev #Used to communicate with SPI devices
+from numpy import interp #Used in order to scale values
 
 #Assign GPIO pin
 
@@ -18,6 +22,8 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(sensorPin, GPIO.IN)
 
 #Variable definitions
+
+thresholdValue = 4.0
 
 detectNum = 1
 
@@ -70,15 +76,39 @@ def isSensorOn(sensorPin):
 		print "MOISTURE DETECTION ON"
 		sendEmail(moisture_detected)
 
+def readContent():
+	voltageRead = MCP3008(0)
+
+	actualVoltage = voltageRead.value * 10
+	print(actualVoltage)
+
+	if actualVoltage >= thresholdValue:
+		print "Plant is dry! Needs water!"
+
+	else:
+		print "Plant watered! All good!"
+
+def readContentTwo(channel_0):
+	spi = spidev.SpiDev()
+	spi.open(0,0) #SPI port
+
+	spi.max_speed_hz = 1350000
+	adc = spi.xfer2([1,(8 + channel_0)<<4,0])
+	raw_adc = ((adc[1]&3) << 8) + adc[2]
+
+	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
+	moisture_Perc= int(moisture_Perc)
+	print 'Moisture Content: ' , moisture_Perc,  '%'
 
 try:
 
 	while True:
 
 			for i in range (detectNum):
-				isSensorOn(sensorPin)
+				#isSensorOn(sensorPin)
+				readContentTwo(0)
 
-			time.sleep(30)
+			time.sleep(10)
 
 			#END
 
