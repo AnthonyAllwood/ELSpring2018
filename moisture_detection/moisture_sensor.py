@@ -23,6 +23,8 @@ GPIO.setup(sensorPin, GPIO.IN)
 
 #Variable definitions
 
+timeStamp = (time.strftime("%Y-%m-%d %H:%M:%S"))
+
 thresholdValue = 4.0
 
 detectNum = 1
@@ -45,6 +47,18 @@ To: Anthony Allwood <a.allwood9@gmail.com>
 Subject: Moisture Sensor message !!!
 
 MOISTURE DETECTED ! """
+
+moisture_low = """ From: Anthony Pi <allwoodpi>
+To: Anthony Allwood <a.allwood9@gmail.com>
+Subject: Moisture Level Update !!!
+
+Moisture Content LOW! Plant is dry! Needs water! """
+
+moisture_stable = """ From: Anthony Pi <allwoodpi>
+To: Anthony Allwood <a.allwood9@gmail.com>
+Subject: Moisture Level Update !!!
+
+Moisture Content Stabilized! Plant watered! All good! """
 
 #Function to send email
 
@@ -98,17 +112,25 @@ def readContentTwo(channel_0):
 
 	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
 	moisture_Perc= int(moisture_Perc)
+
 	print 'Moisture Content: ' , moisture_Perc,  '%'
+
+	if moisture_Perc < 50:
+		sendEmail(moisture_low)
+
+	else:
+		sendEmail(moisture_stable)
 
 try:
 
 	while True:
 
 			for i in range (detectNum):
-				#isSensorOn(sensorPin)
+				isSensorOn(sensorPin)
+				time.sleep(10)
 				readContentTwo(0)
 
-			time.sleep(10)
+			time.sleep(30)
 
 			#END
 
