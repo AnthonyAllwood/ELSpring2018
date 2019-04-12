@@ -90,19 +90,8 @@ def isSensorOn(sensorPin):
 		print "MOISTURE DETECTION ON"
 		sendEmail(moisture_detected)
 
-def readContent():
-	voltageRead = MCP3008(0)
 
-	actualVoltage = voltageRead.value * 10
-	print(actualVoltage)
-
-	if actualVoltage >= thresholdValue:
-		print "Plant is dry! Needs water!"
-
-	else:
-		print "Plant watered! All good!"
-
-def readContentTwo(channel_0):
+def readContent(channel_0):
 	spi = spidev.SpiDev()
 	spi.open(0,0) #SPI port
 
@@ -110,7 +99,7 @@ def readContentTwo(channel_0):
 	adc = spi.xfer2([1,(8 + channel_0)<<4,0])
 	raw_adc = ((adc[1]&3) << 8) + adc[2]
 
-	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
+	interp(raw_adc, [0, 1023], [100, 0])
 	moisture_Perc= int(moisture_Perc)
 
 	print 'Moisture Content: ' , moisture_Perc,  '%'
@@ -121,18 +110,61 @@ def readContentTwo(channel_0):
 	else:
 		sendEmail(moisture_stable)
 
-try:
 
+#Setup SQLite
+
+db = sqlite3.connect("./log/moistureLog.db") #Creates databse in RAM
+cursor = db.cursor() #Get cursor
+db.commit() #Commit the changes above
+
+
+def readForLog(channel_0):
+	spi = spidev.SpiDev()
+	spi.open(0,0) #SPI port
+
+	spi.max_speed_hz = 1350000
+	adc = spi.xfer2([1,(8 + channel_0)<<4,0])
+	raw_adc = ((adc[1]&3) << 8) + adc[2]
+
+	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
+	moisture_Perc= int(moisture_Perc)
+
+
+	return moisture_Perc
+
+try:
+	#with open("./log/moistureLog.db", "a") as log:
 	while True:
 
-			for i in range (detectNum):
-				isSensorOn(sensorPin)
-				time.sleep(10)
-				readContentTwo(0)
+				#for i in range (detectNum):
+				#isSensorOn(sensorPin)
+				#time.sleep(10)
+				#readContent(0)
+				#readForLog(0)
 
-			time.sleep(30)
+		time.sleep(10)
 
-			#END
+		content = readForLog(0)
+
+		if content < 50:
+			status = "Plant not watered!"
+
+		else:
+			status ="Plant watered!"
+
+		moisture_Content = '{0} %'.format(content)
+
+		#print moisture_content
+
+		cursor.execute('''INSERT INTO moistureFormat VALUES(?,?,?)''', (timeStamp, str(moisture_Content), status))
+		db.commit()
+		all_rows = cursor.execute('''SELECT * FROM moistureFormat''')
+		os.system('clear')
+		for row in all_rows:
+			print('{0} : {1} : {2}'.format(str(row[0]), row[1], row[2]))
+
+
+		#END
 
 except KeyboardInterrupt:
 	os.system('clear')
