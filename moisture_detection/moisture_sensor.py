@@ -23,8 +23,6 @@ GPIO.setup(sensorPin, GPIO.IN)
 
 #Variable definitions
 
-timeStamp = (time.strftime("%Y-%m-%d %H:%M:%S"))
-
 thresholdValue = 50
 
 detectNum = 1
@@ -133,35 +131,41 @@ def readForLog(channel_0):
 	return moisture_Perc
 
 try:
-	with open("./log/moistureLog.csv", "a") as log:
-		while True:
+	while True:
 
-			isSensorOn(sensorPin)
-			readContent(0)
+		isSensorOn(sensorPin)
+		readContent(0)
 
-			time.sleep(10)
+		time.sleep(10)
 
-			content = readForLog(0)
+		content = readForLog(0)
 
-			if content < thresholdValue:
-				status = "Plant not watered!"
+		if content < thresholdValue:
+			status = "Plant not watered!"
 
-			else:
-				status ="Plant watered!"
+		else:
+			status ="Plant watered!"
 
-			moisture_Content = '{0} %'.format(content)
+			#cTime = time.time()
+			#wTime = time.time()
+			#os.system('echo '+wTime+'>wateredTime.txt')
+			#wTime = os.popen('cat wateredTime.txt').read()
 
-			#Log to csv file
-			log.write("{0}, {1}, {2}\n".format(timeStamp, str(moisture_Content), status))
-			#Insert into moistureFormat table within database
-			cursor.execute('''INSERT INTO moistureFormat VALUES(?,?,?)''', (timeStamp, str(moisture_Content), status))
-			db.commit()
-			all_rows = cursor.execute('''SELECT * FROM moistureFormat''')
-			os.system('clear')
-			for row in all_rows:
-				print('{0} : {1} : {2}'.format(row[0], row[1], row[2]))
+		#elasped = cTime - wTime
 
-			#END
+		moisture_Content = '{0} %'.format(content)
+
+		#Update timeStamp
+		timeStamp = (time.strftime("%Y-%m-%d %H:%M:%S"))
+		#Insert into moistureFormat table within database
+		cursor.execute('''INSERT INTO moistureFormat VALUES(?,?,?)''', (timeStamp, str(moisture_Content), status))
+		db.commit()
+		all_rows = cursor.execute('''SELECT * FROM moistureFormat''')
+		os.system('clear')
+		for row in all_rows:
+			print('{0} : {1} : {2}'.format(row[0], row[1], row[2]))
+
+		#END
 
 except KeyboardInterrupt:
 	os.system('clear')
