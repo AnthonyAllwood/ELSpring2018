@@ -25,7 +25,7 @@ GPIO.setup(sensorPin, GPIO.IN)
 
 timeStamp = (time.strftime("%Y-%m-%d %H:%M:%S"))
 
-thresholdValue = 4.0
+thresholdValue = 50
 
 detectNum = 1
 
@@ -80,7 +80,7 @@ def sendEmail(message_send):
 
 		print "Error: Email was unable to send..."
 
-
+#Function to determine is sensor is on or off
 def isSensorOn(sensorPin):
 	if GPIO.input(sensorPin):
 		print "MOISTURE DETECTION OFF"
@@ -90,7 +90,7 @@ def isSensorOn(sensorPin):
 		print "MOISTURE DETECTION ON"
 		sendEmail(moisture_detected)
 
-
+#Function reads the moisture content value and sends an email notifying if moisture content is low or stable
 def readContent(channel_0):
 	spi = spidev.SpiDev()
 	spi.open(0,0) #SPI port
@@ -99,12 +99,12 @@ def readContent(channel_0):
 	adc = spi.xfer2([1,(8 + channel_0)<<4,0])
 	raw_adc = ((adc[1]&3) << 8) + adc[2]
 
-	interp(raw_adc, [0, 1023], [100, 0])
+	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
 	moisture_Perc= int(moisture_Perc)
 
 	print 'Moisture Content: ' , moisture_Perc,  '%'
 
-	if moisture_Perc < 50:
+	if moisture_Perc < thresholdValue:
 		sendEmail(moisture_low)
 
 	else:
@@ -117,7 +117,7 @@ db = sqlite3.connect("./log/moistureLog.db") #Creates databse in RAM
 cursor = db.cursor() #Get cursor
 db.commit() #Commit the changes above
 
-
+#Function for logging to database file
 def readForLog(channel_0):
 	spi = spidev.SpiDev()
 	spi.open(0,0) #SPI port
@@ -133,38 +133,35 @@ def readForLog(channel_0):
 	return moisture_Perc
 
 try:
-	#with open("./log/moistureLog.db", "a") as log:
-	while True:
+	with open("./log/moistureLog.csv", "a") as log:
+		while True:
 
-				#for i in range (detectNum):
-				#isSensorOn(sensorPin)
-				#time.sleep(10)
-				#readContent(0)
-				#readForLog(0)
+			isSensorOn(sensorPin)
+			readContent(0)
 
-		time.sleep(10)
+			time.sleep(10)
 
-		content = readForLog(0)
+			content = readForLog(0)
 
-		if content < 50:
-			status = "Plant not watered!"
+			if content < thresholdValue:
+				status = "Plant not watered!"
 
-		else:
-			status ="Plant watered!"
+			else:
+				status ="Plant watered!"
 
-		moisture_Content = '{0} %'.format(content)
+			moisture_Content = '{0} %'.format(content)
 
-		#print moisture_content
+			#Log to csv file
+			log.write("{0}, {1}, {2}\n".format(timeStamp, str(moisture_Content), status))
+			#Insert into moistureFormat table within database
+			cursor.execute('''INSERT INTO moistureFormat VALUES(?,?,?)''', (timeStamp, str(moisture_Content), status))
+			db.commit()
+			all_rows = cursor.execute('''SELECT * FROM moistureFormat''')
+			os.system('clear')
+			for row in all_rows:
+				print('{0} : {1} : {2}'.format(row[0], row[1], row[2]))
 
-		cursor.execute('''INSERT INTO moistureFormat VALUES(?,?,?)''', (timeStamp, str(moisture_Content), status))
-		db.commit()
-		all_rows = cursor.execute('''SELECT * FROM moistureFormat''')
-		os.system('clear')
-		for row in all_rows:
-			print('{0} : {1} : {2}'.format(str(row[0]), row[1], row[2]))
-
-
-		#END
+			#END
 
 except KeyboardInterrupt:
 	os.system('clear')
