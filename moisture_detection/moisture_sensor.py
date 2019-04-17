@@ -4,6 +4,7 @@
 
 import RPi.GPIO as GPIO
 import time
+import datetime
 import os
 import sqlite3  #This library will be used to log the timestamp and moisture readings to the database
 import smtplib  #This is the library that will be utilized in order to send email notification
@@ -23,9 +24,9 @@ GPIO.setup(sensorPin, GPIO.IN)
 
 #Variable definitions
 
-thresholdValue = 50
+oldVal = 0
 
-detectNum = 1
+thresholdValue = 50
 
 smtpUser = 'a.allwood9@gmail.com' #SMTO provider username
 smtpPass = 'TB2freshh23' #SMTP provider password
@@ -58,8 +59,8 @@ Subject: Moisture Level Update !!!
 
 Moisture Content Stabilized! Plant watered! All good! """
 
-#Function to send email
 
+#Function to send email
 def sendEmail(message_send):
 	try:
 		smtpObject = smtplib.SMTP('smtp.gmail.com', 587)
@@ -78,7 +79,7 @@ def sendEmail(message_send):
 
 		print "Error: Email was unable to send..."
 
-#Function to determine is sensor is on or off
+#Function to determine if sensor is on or off
 def isSensorOn(sensorPin):
 	if GPIO.input(sensorPin):
 		print "MOISTURE DETECTION OFF"
@@ -108,6 +109,7 @@ def readContent(channel_0):
 	else:
 		sendEmail(moisture_stable)
 
+	return moisture_Perc
 
 #Setup SQLite
 
@@ -115,20 +117,6 @@ db = sqlite3.connect("./log/moistureLog.db") #Creates databse in RAM
 cursor = db.cursor() #Get cursor
 db.commit() #Commit the changes above
 
-#Function for logging to database file
-def readForLog(channel_0):
-	spi = spidev.SpiDev()
-	spi.open(0,0) #SPI port
-
-	spi.max_speed_hz = 1350000
-	adc = spi.xfer2([1,(8 + channel_0)<<4,0])
-	raw_adc = ((adc[1]&3) << 8) + adc[2]
-
-	moisture_Perc= interp(raw_adc, [0, 1023], [100, 0])
-	moisture_Perc= int(moisture_Perc)
-
-
-	return moisture_Perc
 
 try:
 	while True:
@@ -136,22 +124,33 @@ try:
 		isSensorOn(sensorPin)
 		readContent(0)
 
-		time.sleep(10)
+		time.sleep(30)
 
-		content = readForLog(0)
+		content = readContent(0)
 
+		#This sets the status variable depending on condition below
 		if content < thresholdValue:
 			status = "Plant not watered!"
 
 		else:
 			status ="Plant watered!"
 
-			#cTime = time.time()
-			#wTime = time.time()
-			#os.system('echo '+wTime+'>wateredTime.txt')
-			#wTime = os.popen('cat wateredTime.txt').read()
+		#If content value increases, it takes the exact time of when it increased (in unix time) and puts it in a text file.
+		#This basically records when the plant was watered.
+		if content > oldVal:
+			cTime = time.time()
+			wTime = time.time()
+			os.system('echo '+str(wTime)+'>wateredTime.txt')
+			wTime = os.popen('cat wateredTime.txt').read()
+			oldVal = content
 
-		#elasped = cTime - wTime
+		else: #If it does not increase
+			print "Moisture Content has not increased"
+
+		elapsed_Unix = cTime - float(wTime) #Time elapsed from the last time plant was watered (unix time)
+
+		elapsed = str(datetime.timedelta(seconds=elapsed_Unix)) #Time elapsed in days-hours-minutes-seconds. Sent to email.
+
 
 		moisture_Content = '{0} %'.format(content)
 
